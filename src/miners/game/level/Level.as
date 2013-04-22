@@ -45,7 +45,7 @@ package miners.game.level
 		
 		private var _physicsSpace:Space;
 		private var _physicsDebug:Debug;
-		private var _debugPhysics:Boolean = true;
+		private var _debugPhysics:Boolean = false;
 		private var _prevTimeMS:int;
         private var _simulationTime:Number;
 		private var _nextRowDeletionY:Number;
@@ -144,7 +144,7 @@ package miners.game.level
 		private function initCamera():void
 		{			
 			var spatial:SpatialComponent = new SpatialComponent();
-			var cameraComponent:CameraComponent = new CameraComponent(container, 0, 50);
+			var cameraComponent:CameraComponent = new CameraComponent(container, 0, 0);
 			_camera = _sceneManager.createEntity([spatial, cameraComponent]);
 			_camera.setAttribute("y", -20);
 			_nextRowDeletionY = -params.nodeSize;
@@ -266,7 +266,7 @@ package miners.game.level
 		{
 			_camera.setAttribute("y", _camera.y + elapsedTime * 10);
 			var visibleHeight:Number = params.numRows * params.nodeSize;
-			if (container.y <= _nextRowDeletionY + 50)
+			if (container.y <= _nextRowDeletionY)
 			{
 				_nextRowDeletionY -= params.nodeSize;
 				container.dispatchEvent(new GameEvent(GameEvent.CONSTRUCT_ROW));
