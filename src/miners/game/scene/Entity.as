@@ -7,67 +7,51 @@ package miners.game.scene
 	public class Entity extends Sprite
 	{
 		public var manager:SceneManager;
-		private var _components:Dictionary;
+		private var _components:Vector.<IEntityComponent>;
 		private var _attributes:Dictionary;
 		
 		public function Entity(manager:SceneManager)
 		{
 			this.manager = manager;
-			_components = new Dictionary();
+			_components = new Vector.<IEntityComponent>();
 			_attributes = new Dictionary();
 		}
 		
 		public function init():void
 		{
-			for each(var components:Vector.<IEntityComponent> in _components)
+			for each (var component:IEntityComponent in _components)
 			{
-				for each(var component:IEntityComponent in components)
-				{
-					component.init();
-				}
+				component.init();
 			}
 			
 			addDisplayComponents();
 		}
 		
-		public function destroy():void 
+		// Should only be called from the SceneManager who owns this instance.
+		internal function destroy():void 
 		{
 			removeDisplayComponents();
 			removeAllComponents();
 		}
 		
 		private function addDisplayComponents():void
-		{
-			var entityComponents:Vector.<IEntityComponent> = getComponentsOfType(IDisplayComponent);
-			if (entityComponents == null)
+		{			
+			for each(var component:IEntityComponent in _components)
 			{
-				return;
-			}
-			
-			var displayComponents:Vector.<IDisplayComponent> = Vector.<IDisplayComponent>(entityComponents);
-			if (displayComponents != null)
-			{
-				for each(var displayComponent:IDisplayComponent in displayComponents)
+				if (component is IDisplayComponent)
 				{
-					addChild(displayComponent.displayObject);
+					addChild(IDisplayComponent(component).displayObject);
 				}
 			}
 		}
 		
 		private function removeDisplayComponents():void
-		{
-			var entityComponents:Vector.<IEntityComponent> = getComponentsOfType(IDisplayComponent);
-			if (entityComponents == null)
+		{			
+			for each(var component:IEntityComponent in _components)
 			{
-				return;
-			}
-			
-			var displayComponents:Vector.<IDisplayComponent> = Vector.<IDisplayComponent>(entityComponents);
-			if (displayComponents != null)
-			{
-				for each(var displayComponent:IDisplayComponent in displayComponents)
+				if (component is IDisplayComponent)
 				{
-					displayComponent.displayObject.removeFromParent();
+					IDisplayComponent(component).displayObject.removeFromParent();
 				}
 			}
 		}
@@ -153,30 +137,39 @@ set the value through the EntityAttribute reference returned to the component wh
 			}
 		}
 		
+		// returns the first component of the type specified.
+		// use getComponentsOfType to get an array of all components of the type specified.
 		public function getComponent(type:Class):IEntityComponent
 		{
-			if (_components[type] != null && _components[type].length != 1)
+			for each(var component:IEntityComponent in _components)
 			{
-				throw new Error("There is more than one component for the specified type. Please use getComponentsOfType instead.");
+				if (component is type)
+				{
+					return component;
+				}
 			}
 			
-			return IEntityComponent(_components[type][0]);
+			return null;
 		}
 		
 		public function getComponentsOfType(type:Class):Vector.<IEntityComponent>
 		{
-			return _components[type];
+			var componentsToReturn:Vector.<IEntityComponent> = new Vector.<IEntityComponent>();
+			for each (var component:IEntityComponent in _components)
+			{
+				if (component is type)
+				{
+					componentsToReturn.push(component);
+				}
+			}
+			
+			return componentsToReturn;
 		}
 		
 		public function addComponent(component:IEntityComponent, doInit:Boolean=true):void
-		{
-			if (_components[component.type] == null)
-			{
-				_components[component.type] = new Vector.<IEntityComponent>();
-			}
-			
+		{			
 			component.entity = this;
-			_components[component.type].push(component);
+			_components.push(component);
 			
 			if (doInit)
 			{
@@ -186,43 +179,45 @@ set the value through the EntityAttribute reference returned to the component wh
 		
 		public function removeComponent(type:Class, componentToRemove:IEntityComponent):void
 		{
-			var componentsForType:Vector.<IEntityComponent> = _components[type];
-			if (componentsForType != null && componentsForType.length > 0)
+			var componentIndex:int = _components.indexOf(componentToRemove);
+			if (componentIndex != -1)
 			{
-				var componentIndex:int = componentsForType.indexOf(componentToRemove);
-				if (componentIndex != -1)
+				if (componentToRemove is IDisplayComponent)
 				{
-					componentToRemove.entity = null;
-					componentToRemove.destroy();
-					componentsForType.splice(componentIndex, 1);
-					return;
+					IDisplayComponent(componentToRemove).displayObject.removeFromParent();
 				}
+				
+				componentToRemove.destroy();
+				componentToRemove.entity = null;
+				_components.splice(componentIndex, 1);
 			}
-
-			throw new Error("A component of the provided type or instance does not exist in this entity.");			
+			else
+			{
+				throw new Error("A component of the provided type or instance does not exist in this entity.");			
+			}
 		}
 		
 		public function removeAllComponents():void
 		{
-			for each(var components:Vector.<IEntityComponent> in _components)
+			for each (var component:IEntityComponent in _components)
 			{
-				for each(var component:IEntityComponent in components)
+				if (component is IDisplayComponent)
 				{
-					component.destroy();
+					IDisplayComponent(component).displayObject.removeFromParent();
 				}
-				components = null;
+				
+				component.destroy();
+				component.entity = null;
 			}
-			_components = null;
+			
+			_components.splice(0, _components.length);
 		}
 		
 		public function update(elapsedTime:Number):void
 		{
-			for each(var components:Vector.<IEntityComponent> in _components)
+			for each(var component:IEntityComponent in _components)
 			{
-				for each(var component:IEntityComponent in components)
-				{
-					component.update(elapsedTime);
-				}
+				component.update(elapsedTime);
 			}
 		}
 	}

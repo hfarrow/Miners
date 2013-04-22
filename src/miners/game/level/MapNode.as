@@ -2,7 +2,7 @@ package miners.game.level
 {
 	import nape.phys.Body;
 	import starling.display.DisplayObject;
-	import starling.display.Quad;
+	import starling.display.Image;
 	import starling.text.TextField;
 	public class MapNode 
 	{
@@ -10,7 +10,7 @@ package miners.game.level
 		public var xIndex:uint;
 		public var yIndex:uint;
 		public var body:Body;
-		public var quad:Quad;
+		public var quad:Image;
 		public var debugText:TextField;
 		public var container:DisplayObject;
 		
@@ -40,6 +40,7 @@ package miners.game.level
 			{
 				case MapNodeType.DIRT: color = 0x603311; break;
 				case MapNodeType.EXCAVATED: color = 0x292421; break;
+				case MapNodeType.ROCK: color = 0x666666; break;
 				default: color = 0xaf4035; break;
 			}
 			return color;

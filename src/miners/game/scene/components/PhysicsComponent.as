@@ -27,7 +27,9 @@ package miners.game.scene.components
 		
 		public function destroy():void 
 		{
-			
+			_body.space = null;
+			_body = null;
+			_entity.setAttribute("physicsBody", null);
 		}
 		
 		public function get type():Class 

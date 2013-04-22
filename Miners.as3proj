@@ -6,12 +6,12 @@
     <movie input="" />
     <movie path="bin\Miners.swf" />
     <movie fps="60" />
-    <movie width="800" />
-    <movie height="600" />
+    <movie width="468" />
+    <movie height="800" />
     <movie version="11" />
     <movie minorVersion="5" />
     <movie platform="Flash Player" />
-    <movie background="#808080" />
+    <movie background="#292421" />
   </output>
   <!-- Other classes to be compiled into your SWF -->
   <classpaths>

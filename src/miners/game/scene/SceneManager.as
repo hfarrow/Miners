@@ -19,9 +19,9 @@ package miners.game.scene
 			var entity:Entity = new Entity(this);
 			_entities.push(entity);
 			
-			for each(var component:IEntityComponent in components)
+			for (var i:int = 0; i < components.length; ++i)
 			{
-				entity.addComponent(component, false);
+				entity.addComponent(components[i], false);
 			}
 			
 			_root.addChild(entity);
